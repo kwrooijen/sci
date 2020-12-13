@@ -8,8 +8,13 @@
 (derive :sci.error/realized-beyond-max :sci/error)
 (derive :sci.error/parse :sci/error)
 
+(defn iobj? [obj]
+  (and #?(:clj (instance? clojure.lang.IObj obj)
+          :cljs (implements? IWithMeta obj))
+       (meta obj)))
+
 (defn constant? [x]
-  (or (number? x) (string? x) (keyword? x)))
+  (not (iobj? x)))
 
 (defn mark-resolve-sym
   [sym]
@@ -111,11 +116,6 @@
               (throw e))))
         (throw e))
       (throw e))))
-
-(defn iobj? [obj]
-  (and #?(:clj (instance? clojure.lang.IObj obj)
-          :cljs (implements? IWithMeta obj))
-       (meta obj)))
 
 (defn vary-meta*
   "Only adds metadata to obj if d is not nil and if obj already has meta"
